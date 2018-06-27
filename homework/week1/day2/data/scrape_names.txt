@@ -1,0 +1,13 @@
+import requests
+from parsel import Selector
+
+def scrape_year(year):
+    r = requests.post("https://www.ssa.gov/cgi-bin/popularnames.cgi", data={"top":1000, "year":year})
+    sel = Selector(r.text)
+    year_fname = open("names_{}.txt".format(year), "w")
+    for row in sel.css("tr"):
+        row_data = row.css("td::text").extract()
+        if len(row_data) == 3:
+            print(row_data)
+            year_fname.write("|".join(row_data))
+            year_fname.write("\n")
